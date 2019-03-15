@@ -1,19 +1,32 @@
 package maksym.shekhovtsov.rp5telegrambot.bot;
 
 import maksym.shekhovtsov.rp5telegrambot.parser.Rp5parser;
+import javax.annotation.PostConstruct;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
+@Component
 public class SimpleBot extends TelegramLongPollingBot
 {
+
+  @Autowired
+  TelegramBotsApi telegramBotsApi;
+
+  @Autowired
+  SimpleBot simpleBot;
 
   long chatId;
 
@@ -40,12 +53,13 @@ public class SimpleBot extends TelegramLongPollingBot
     }
   }
 
+  @Scheduled(fixedRate = 100000)
   public void sendRandomMessage() throws Exception
   {
     String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
 
-    String apiToken = "my_bot_api_token";
-    String chatId = "@my_channel_name";
+    String apiToken = "689824969:AAGYbGwztJUh0Vwu1rAbyHdMNy45mHndicI";
+    String chatId = "" + myId;
     String text = "Hello world!";
 
     urlString = String.format(urlString, apiToken, chatId, text);
@@ -75,5 +89,11 @@ public class SimpleBot extends TelegramLongPollingBot
   public String getBotToken()
   {
     return "689824969:AAGYbGwztJUh0Vwu1rAbyHdMNy45mHndicI";
+  }
+
+  @PostConstruct
+  public void registerBot() throws TelegramApiRequestException
+  {
+    telegramBotsApi.registerBot(simpleBot);
   }
 }
